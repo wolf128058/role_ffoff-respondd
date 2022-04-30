@@ -1,0 +1,6 @@
+---
+respondd_wan: "{{ ansible_default_ipv4.interface }}"
+respondd_router_name: "🤦 Unchanged Routername"
+respondd_router_hardware: "{{ ansible_system_vendor }} {{ ansible_product_name }}"
+respondd_router_contact: ""
+respondd_router_site_code: "FFMUC Welt"

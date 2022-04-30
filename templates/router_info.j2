@@ -1,0 +1,16 @@
+{
+  "nodeinfo": {
+    "hostname": "{{ respondd_router_name }}",
+    "hardware": {
+      "model": "{{ respondd_router_hardware }}"
+    },
+    "owner": {
+      "contact": "{{ respondd_router_contact }}"
+    },
+    "system": {
+      "site_code": "{{ respondd_site_code }}",
+      "role": "client"
+    }
+  },
+  "firstseen": "{{ lookup('pipe', 'date +%Y-%m-%dT%H:%M:%S')}}"
+}
