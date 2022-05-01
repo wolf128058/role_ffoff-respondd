@@ -10,7 +10,15 @@
     "system": {
       "site_code": "{{ respondd_router_site_code }}",
       "role": "client"
+{% if respondd_lat and respondd_long %}
+    },
+   "location": {
+      "latitude": {{ respondd_lat }},
+      "longitude": {{ respondd_long }}
     }
+{% else %}
+    }
+{% endif %}
   },
   "firstseen": "{{ lookup('pipe', 'date +%Y-%m-%dT%H:%M:%S')}}"
 }
