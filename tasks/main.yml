@@ -7,6 +7,7 @@
     pkg:
       - git
       - python3-netifaces
+      - python3-pip
     state: present
 
 - name: Clone my respondd with git
