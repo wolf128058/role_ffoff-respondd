@@ -8,3 +8,9 @@ respondd_router_name: "🤦 Unchanged Routername"
 respondd_router_hardware: "{{ ansible_system_vendor }} {{ ansible_product_name }}"
 respondd_router_contact: ""
 respondd_router_site_code: "FFMUC Welt"
+respondd_healthcheck_enabled: true
+respondd_healthcheck_interval: "*/5"
+respondd_healthcheck_timeout: 3
+respondd_healthcheck_address: "ff05::2:1001"
+respondd_healthcheck_port: 1001
+respondd_healthcheck_expected_node_id: "{{ ansible_facts.default_ipv4.macaddress | default('') | lower | replace(':', '') }}"

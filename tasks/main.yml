@@ -53,10 +53,21 @@
     enabled: yes
     state: restarted
 
-- name: Cronjob checking if service is up and running and restart it if needed
+- name: Create ext-respondd healthcheck
+  become: yes
+  template:
+    src: 'templates/ext-respondd-healthcheck.py.j2'
+    dest: '/usr/local/sbin/ext-respondd-healthcheck'
+    owner: 'root'
+    group: 'root'
+    mode: 'u=rwx,g=rx,o=rx'
+  when: respondd_healthcheck_enabled
+
+- name: Cronjob checking if ext-respondd answers and restart it if needed
   become: yes
   cron:
     name: "Restart stuck ext-respondd"
-    minute: "*/15"
+    minute: "{{ respondd_healthcheck_interval }}"
     hour: "*"
-    job: "systemctl is-active --quiet ext-respondd || systemctl restart ext-respondd"
+    job: "/usr/local/sbin/ext-respondd-healthcheck"
+  when: respondd_healthcheck_enabled
