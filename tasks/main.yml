@@ -17,6 +17,15 @@
     dest: /opt/ext-respondd/
     force: yes
 
+- name: Patch ext-respondd to filter deprecated temporary IPv6 addresses
+  become: yes
+  template:
+    src: 'templates/ext-respondd-nodeinfo.py.j2'
+    dest: '/opt/ext-respondd/lib/nodeinfo.py'
+    owner: 'root'
+    group: 'root'
+    mode: 'u=rw,g=r,o=r'
+
 - name: Copy systemd file
   become: yes
   copy:

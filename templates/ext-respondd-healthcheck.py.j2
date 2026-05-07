@@ -18,7 +18,7 @@ def log(message):
     print("ext-respondd-healthcheck: " + message, file=sys.stderr)
 
 
-def query_nodeinfo(interface, address, port, timeout):
+def query_nodeinfo(interface, address, port, timeout, expected_node_id):
     ifindex = socket.if_nametoindex(interface)
     sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
     sock.settimeout(timeout)
@@ -28,15 +28,22 @@ def query_nodeinfo(interface, address, port, timeout):
     sock.sendto(b"nodeinfo", (address, port, 0, ifindex))
 
     deadline = time.monotonic() + timeout
+    seen_node_ids = []
     while True:
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            raise TimeoutError("no nodeinfo response received")
+            details = ""
+            if seen_node_ids:
+                details = "; saw node_id(s): " + ", ".join(sorted(set(seen_node_ids)))
+            raise TimeoutError("no matching nodeinfo response received" + details)
         sock.settimeout(remaining)
         data, _source = sock.recvfrom(65535)
         payload = json.loads(data.decode("utf-8"))
         if isinstance(payload, dict) and payload.get("node_id"):
-            return payload
+            node_id = str(payload.get("node_id", "")).lower()
+            seen_node_ids.append(node_id)
+            if node_id == expected_node_id:
+                return payload
 
 
 def restart_service(service):
@@ -58,16 +65,15 @@ def main():
         return 2
 
     try:
-        nodeinfo = query_nodeinfo(args.interface, args.address, args.port, args.timeout)
+        nodeinfo = query_nodeinfo(
+            args.interface,
+            args.address,
+            args.port,
+            args.timeout,
+            args.expected_node_id.lower(),
+        )
     except Exception as exc:
         log(str(exc))
-        restart_service(args.restart_service)
-        return 1
-
-    actual_node_id = str(nodeinfo.get("node_id", "")).lower()
-    expected_node_id = args.expected_node_id.lower()
-    if actual_node_id != expected_node_id:
-        log("unexpected node_id: got %s, expected %s" % (actual_node_id, expected_node_id))
         restart_service(args.restart_service)
         return 1
 
