@@ -36,6 +36,24 @@
     group: root
     mode: u=rw,g=r,o=r
 
+- name: Create ext-respondd systemd drop-in directory
+  become: yes
+  file:
+    path: /etc/systemd/system/ext-respondd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure ext-respondd starts after the Freifunk bridge
+  become: yes
+  template:
+    src: 'templates/ext-respondd-bridge-ordering.conf.j2'
+    dest: '/etc/systemd/system/ext-respondd.service.d/bridge-ordering.conf'
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Create welt directory
   become: yes
   template:
